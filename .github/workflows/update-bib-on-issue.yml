@@ -16,8 +16,8 @@ jobs:
           curl -L -o jabref.tar.gz https://github.com/JabRef/jabref/releases/download/v5.15/JabRef-5.15-portable_linux.tar.gz
           mkdir jabref
           tar -xzf jabref.tar.gz -C jabref --strip-components=1
-          chmod +x jabref/jabref
-          echo "$GITHUB_WORKSPACE/jabref" >> $GITHUB_PATH
+          chmod +x jabref/bin/JabRef
+          echo "$GITHUB_WORKSPACE/jabref/bin" >> $GITHUB_PATH
 
       - name: Extract DOIs and update bib using JabRef
         run: |
