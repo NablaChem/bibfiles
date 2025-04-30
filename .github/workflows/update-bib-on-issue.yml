@@ -1,4 +1,4 @@
-name: Update Bib from DOI Issue
+name: Update Bib Using JabRef
 
 on:
   issues:
@@ -11,30 +11,31 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Extract DOIs and append BibTeX
+      - name: Install JabRef CLI
+        run: |
+          curl -L -o jabref.zip https://github.com/JabRef/jabref/releases/latest/download/JabRef-portable_linux.zip
+          unzip jabref.zip -d jabref
+          chmod +x jabref/jabref
+          echo "$GITHUB_WORKSPACE/jabref" >> $GITHUB_PATH
+
+      - name: Extract DOIs and update bib using JabRef
         run: |
           echo "${{ github.event.issue.body }}" > issue_body.txt
-          
-          # Extract non-empty lines (assume each line is a DOI)
           grep -v '^\s*$' issue_body.txt | while read -r doi; do
-            # Escape special characters for curl
-            encoded_doi=$(python3 -c "import urllib.parse; print(urllib.parse.quote('''$doi'''))")
-            
-            echo "Fetching: $doi"
-            bibtex=$(curl -sLH "Accept: application/x-bibtex" "https://doi.org/$encoded_doi" || echo "")
-
-            if [[ "$bibtex" == @* ]]; then
-              echo "$bibtex" >> nablachem.bib
-              echo "Appended BibTeX for: $doi"
-            else
-              echo "Warning: Failed to fetch BibTeX for: $doi"
-            fi
+            echo "Importing: $doi"
+            jabref/jabref --importToOpen "$doi" --output nablachem.bib
           done
 
-      - name: Commit and push bib update
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add nablachem.bib
           git commit -m "Update nablachem.bib from issue #${{ github.event.issue.number }}" || echo "No changes"
           git push
+
+      - name: Close issue
+        uses: peter-evans/close-issue@v2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment: "DOIs processed and added to nablachem.bib."
