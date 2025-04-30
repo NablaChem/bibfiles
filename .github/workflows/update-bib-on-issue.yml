@@ -24,7 +24,7 @@ jobs:
           echo "${{ github.event.issue.body }}" > issue_body.txt
           grep -v '^\s*$' issue_body.txt | while read -r doi; do
             echo "Importing: $doi"
-            $GITHUB_WORKSPACE/jabref/bin --importToOpen "$doi" --output nablachem.bib
+            $GITHUB_WORKSPACE/jabref/bin/JabRef --importToOpen "$doi" --output nablachem.bib
           done
 
       - name: Commit and push changes
