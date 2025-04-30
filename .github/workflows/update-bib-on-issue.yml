@@ -13,8 +13,9 @@ jobs:
 
       - name: Install JabRef CLI
         run: |
-          curl -L -o jabref.zip https://github.com/JabRef/jabref/releases/latest/download/JabRef-portable_linux.zip
-          unzip jabref.zip -d jabref
+          curl -L -o jabref.tar.gz https://github.com/JabRef/jabref/releases/download/v5.15/JabRef-5.15-portable_linux.tar.gz
+          mkdir jabref
+          tar -xzf jabref.tar.gz -C jabref --strip-components=1
           chmod +x jabref/jabref
           echo "$GITHUB_WORKSPACE/jabref" >> $GITHUB_PATH
 
